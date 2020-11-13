@@ -13,6 +13,7 @@ Follow the github handbook to upload your file to the repository. Your code will
 Here is a template you can follow
 '''
 
+import numpy
 class TicTacToe:
     def __init__(self):
         self.board = np.zeros(9)
