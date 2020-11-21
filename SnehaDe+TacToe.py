@@ -1,49 +1,55 @@
 import numpy as np
-from numpy import random as r
+import random
+import math
+
 
 # x: 1
 # o: -1
-
-def play():
-    #this is where you will instantiate the TicTacToe class, and while no player has won, continue with the loop
-    pass
-
-# MAKE SURE TO CALL play()
-
 
 
 class TicTacToe:
     def __init__(self):
         self.board = np.zeros(9)
-        self.dimension = math.sqrt(self.board.shape)
-        self.lastValidIndex = dimension - 1
+        self.dimension = 3
+        self.lastValidIndex = self.dimension - 1
         self.over = False
         self.turn = 1
 
+    # Reshapes it into the normal board shape (2D)
+    def normalShape(self):
+        return self.board.reshape(self.dimension, self.dimension)
+
     def action(self, move):
-        # make sure to change the turn : self.turn = self.turn * -1
-        # board[move] = turn
+        # valid move will be when the index is less than the size, and the index is currently 0
+        if self.spotsAvailable():
+            print(self.spotsAvailable())
+            while self.board[move] != 0:
+                move = self.makeRandomMove()
+                # print(self.normalShape())
+                
+            self.board[move] = self.turn
+            self.turn = self.turn * -1
 
-        #self.dimension * move[0] accounts for the row, move[1] is the col. adding these represents when the array is flat.
-        self.board[self.dimension * move[0] + move[1]] = turn
-        self.turn = self.turn * -1
-        isWinner(self)
+        print(self.normalShape())
 
-    def isWinner(self):
-        # check each horizontal and vertical line, and check the diagonal.
-        #there are 2 main ways to check the diagonal, easy way is to check them explicitly, and the harder way is to use np.eye(), np.fliplr(), and 
-        #other ways to check the main diagonal with numpy
-        pass
-    
+        self.isWinner()
+
+    def spotsAvailable(self):
+        indexes = np.where(self.board == 0)
+        return len(indexes) != 0
+
+    @staticmethod
+    def makeRandomMove():
+        return random.randint(0, 8)
+
     def clearBoard(self):
         self.board = np.zeros(9)
         self.over = False
         self.turn = 1
-        pass
 
     def checkHori(self, row, playerToCheck):
-        if dimension > row:
-            properView = normalShape(self)
+        if self.dimension > row:
+            properView = self.normalShape()
 
             xHoriWin = np.array([1, 1, 1])
             yHoriWin = np.array([-1, -1, -1])
@@ -58,8 +64,8 @@ class TicTacToe:
         return False
 
     def checkVert(self, col, playerToCheck):
-        if dimension > col:
-            properView = normalShape(self)
+        if self.dimension > col:
+            properView = self.normalShape()
 
             xVertWin = np.array(([1], [1], [1]))
             yVertWin = np.array(([-1], [-1], [-1]))
@@ -67,7 +73,7 @@ class TicTacToe:
             toCheck = np.array(())
             for x in range(self.dimension):
                 toAdd = properView[x][col]
-                toCheck = numpy.append(toCheck, toAdd)
+                toCheck = np.append(toCheck, toAdd)
 
             if playerToCheck == "x":
                 return np.array_equal(toCheck, xVertWin)
@@ -76,27 +82,85 @@ class TicTacToe:
 
         return False
 
-    #dir = left: go from topL to bottomR - dir = right: go from topR to bottomL
-    def checkDiag(self, dir, playerToCheck):
-        properView = normalShape(self)
-        
+    # dir = left: go from topL to bottomR - dir = right: go from topR to bottomL
+    def checkDiag(self, direct, playerToCheck):
+        properView = self.normalShape()
+
         xFlatWin = np.array((1, 1, 1))
         yFlatWin = np.array((-1, -1, -1))
 
         toCheck = np.array(())
 
-        if dir == "left":
+        if direct == "left":
             toCheck = properView.diagonal()
         else:
             toCheck = np.fliplr(properView).diagonal()
-
 
         if playerToCheck == "x":
             return np.array_equal(toCheck, xFlatWin)
         else:
             return np.array_equal(toCheck, yFlatWin)
 
+    def isWinner(self):
+        # z means no one won
+        winner = "z"
 
-    #Reshapes it into the normal board shape (2D)
-    def normalShape(self)
-        return self.board.reshape(self.dimension, self.dimension)
+        for a in range(self.dimension):
+            xWonDiag = self.checkDiag("left", "x") or self.checkDiag("right", "x")
+            yWonDiag = self.checkDiag("left", "y") or self.checkDiag("right", "y")
+
+            xWonStraight = self.checkHori(a, "x") or self.checkVert(a, "x")
+            yWonStraight = self.checkHori(a, "y") or self.checkVert(a, "y")
+
+            if xWonStraight or xWonDiag:
+                winner = "x"
+                break
+            elif yWonStraight or yWonDiag:
+                winner = "y"
+                break
+
+        if winner != "z":
+            self.over = True
+            if winner == "x":
+                print("Comp1 Wins")
+            else:
+                print("Comp2 Wins")
+        elif not self.spotsAvailable():
+            self.over = True
+            print("Draw")
+            
+        
+        print("")
+
+        if self.over:
+            self.clearBoard()
+            
+            if input("Play Again?") == "y":
+                self.action(self.makeRandomMove())
+            else:
+                print("Thank you for playing.")
+
+
+def play():
+    game = TicTacToe()
+
+    while not game.over:
+        print("-------------")
+        print()
+
+        if game.turn == 1:
+            print("Comp1's Turn")
+        else:
+            print("Comp2's Turn")
+
+        print()
+
+        # first call to start the game
+        game.action(game.makeRandomMove())
+
+    print()
+    print("Game Over")
+
+
+# MAKE SURE TO CALL play()
+play()
