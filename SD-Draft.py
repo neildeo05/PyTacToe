@@ -3,10 +3,10 @@ import random
 import math
 
 
+# DEPRECATED, SEE SD-TACTOE FOR FINAL 
+
 # x: 1
 # o: -1
-
-
 class TicTacToe:
     def __init__(self):
         self.board = np.zeros(9)
@@ -136,6 +136,7 @@ class TicTacToe:
             self.clearBoard()
             
             if input("Play Again?") == "y":
+                print("Starting new game..\n\n")
                 self.action(self.makeRandomMove())
             else:
                 print("Thank you for playing.")
